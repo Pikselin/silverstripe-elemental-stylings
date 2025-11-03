@@ -34,9 +34,6 @@
         "process-timeout": 600
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "dev-SS6"
-        },
         "expose": [
             "client/dist"
         ]
