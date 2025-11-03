@@ -35,7 +35,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "SS6"
+            "dev-master": "dev-SS6"
         },
         "expose": [
             "client/dist"
