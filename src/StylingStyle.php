@@ -86,7 +86,5 @@ class StylingStyle extends Extension
         $style = array_key_first($style);
 
         $this->getOwner()->Style = $style;
-
-        parent::populateDefaults();
     }
 }
