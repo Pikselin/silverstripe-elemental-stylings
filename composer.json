@@ -1,5 +1,5 @@
 {
-    "name": "fractas/elemental-stylings",
+    "name": "pikselin/elemental-stylings",
     "type": "silverstripe-vendormodule",
     "description": "Collection of useful and reusable SilverStripe Elemental stylings properties",
     "homepage": "http://github.com/fractaslabs/silverstripe-elemental-stylings",
@@ -23,8 +23,11 @@
         "email": "petar.simic@fractas.com"
     }],
     "require": {
-        "dnadesign/silverstripe-elemental": "^4 || ^5",
-        "silverstripe/vendor-plugin": "^1 || ^2"
+        "dnadesign/silverstripe-elemental": "^6",
+        "silverstripe/vendor-plugin": "^3"
+    },
+    "replace": {
+        "fractas/elemental-stylings": "*"
     },
     "require-dev": {},
     "config": {
@@ -32,7 +35,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.x-dev"
+            "dev-master": "SS6"
         },
         "expose": [
             "client/dist"
