@@ -2,12 +2,16 @@
 
 namespace Fractas\ElementalStylings;
 
+use SilverStripe\Core\Extension;
+use SilverStripe\Model\ArrayData;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\ORM\DataExtension;
-use SilverStripe\View\ArrayData;
 
-class StylingLimit extends DataExtension
+/**
+ * @property ?string $Limit
+ * @extends Extension<static>
+ */
+class StylingLimit extends Extension
 {
     private static $db = [
         'Limit' => 'Varchar(255)',
@@ -32,14 +36,14 @@ class StylingLimit extends DataExtension
 
     public function getStylingLimitNice($key)
     {
-        return (!empty($this->owner->config()->get('limit')[$key])) ? $this->owner->config()->get('limit')[$key] : $key;
+        return (!empty($this->getOwner()->config()->get('limit')[$key])) ? $this->getOwner()->config()->get('limit')[$key] : $key;
     }
 
     public function getStylingLimitData()
     {
         return ArrayData::create([
-           'Label' => self::$singular_name,
-           'Value' => $this->getStylingLimitNice($this->owner->Limit),
+           'Label' => self::config()->get('singular_name'),
+           'Value' => $this->getStylingLimitNice($this->getOwner()->Limit),
        ]);
     }
 
@@ -48,8 +52,8 @@ class StylingLimit extends DataExtension
      */
     public function getLimitVariant()
     {
-        $limit = $this->owner->Limit;
-        $limits = $this->owner->config()->get('limit');
+        $limit = $this->getOwner()->Limit;
+        $limits = $this->getOwner()->config()->get('limit');
 
         if (isset($limits[$limit])) {
             $limit = strtolower($limit);
@@ -60,11 +64,11 @@ class StylingLimit extends DataExtension
         return 'limit-'.$limit;
     }
 
-    public function updateCMSFields(FieldList $fields)
+    protected function updateCMSFields(FieldList $fields)
     {
-        $limit = $this->owner->config()->get('limit');
+        $limit = $this->getOwner()->config()->get('limit');
         if ($limit && count($limit) > 1) {
-            $fields->addFieldsToTab('Root.Styling', DropdownField::create('Limit', _t(__CLASS__.'.LIMIT', 'Limit'), $limit));
+            $fields->addFieldToTab('Root.Styling', DropdownField::create('Limit', _t(__CLASS__.'.LIMIT', 'Limit'), $limit));
         } else {
             $fields->removeByName('Limit');
         }
@@ -72,12 +76,12 @@ class StylingLimit extends DataExtension
         return $fields;
     }
 
-    public function populateDefaults()
+    public function onAfterPopulateDefaults()
     {
-        $limit = $this->owner->config()->get('limit');
+        $limit = $this->getOwner()->config()->get('limit');
         $limit = reset($limit);
 
-        $this->owner->Limit = $limit;
+        $this->getOwner()->Limit = $limit;
 
         parent::populateDefaults();
     }

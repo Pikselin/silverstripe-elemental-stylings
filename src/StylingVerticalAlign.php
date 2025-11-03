@@ -2,12 +2,16 @@
 
 namespace Fractas\ElementalStylings;
 
+use SilverStripe\Core\Extension;
+use SilverStripe\Model\ArrayData;
 use Fractas\ElementalStylings\Forms\StylingOptionsetField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\ORM\DataExtension;
-use SilverStripe\View\ArrayData;
 
-class StylingVerticalAlign extends DataExtension
+/**
+ * @property ?string $VerAlign
+ * @extends Extension<static>
+ */
+class StylingVerticalAlign extends Extension
 {
     private static $db = [
         'VerAlign' => 'Varchar(255)',
@@ -32,14 +36,14 @@ class StylingVerticalAlign extends DataExtension
 
     public function getStylingVerticalAlignNice($key)
     {
-        return (!empty($this->owner->config()->get('veralign')[$key])) ? $this->owner->config()->get('veralign')[$key] : $key;
+        return (!empty($this->getOwner()->config()->get('veralign')[$key])) ? $this->getOwner()->config()->get('veralign')[$key] : $key;
     }
 
     public function getStylingVerticalAlignData()
     {
         return ArrayData::create([
-           'Label' => self::$singular_name,
-           'Value' => $this->getStylingVerticalAlignNice($this->owner->VerAlign),
+           'Label' => self::config()->get('singular_name'),
+           'Value' => $this->getStylingVerticalAlignNice($this->getOwner()->VerAlign),
        ]);
     }
 
@@ -48,8 +52,8 @@ class StylingVerticalAlign extends DataExtension
      */
     public function getVerAlignVariant()
     {
-        $veralign = $this->owner->VerAlign;
-        $veraligns = $this->owner->config()->get('veralign');
+        $veralign = $this->getOwner()->VerAlign;
+        $veraligns = $this->getOwner()->config()->get('veralign');
 
         if (isset($veraligns[$veralign])) {
             $veralign = strtolower($veralign);
@@ -60,12 +64,12 @@ class StylingVerticalAlign extends DataExtension
         return 'veralign-'.$veralign;
     }
 
-    public function updateCMSFields(FieldList $fields)
+    protected function updateCMSFields(FieldList $fields)
     {
         $fields->removeByName('VerAlign');
-        $veralign = $this->owner->config()->get('veralign');
+        $veralign = $this->getOwner()->config()->get('veralign');
         if ($veralign && count($veralign) > 1) {
-            $fields->addFieldsToTab(
+            $fields->addFieldToTab(
                 'Root.Styling',
                 StylingOptionsetField::create('VerAlign', _t(__CLASS__.'.VERTICALALIGN', 'Vertical Align'), $veralign)
             );
@@ -74,16 +78,16 @@ class StylingVerticalAlign extends DataExtension
         return $fields;
     }
 
-    public function populateDefaults()
+    public function onAfterPopulateDefaults()
     {
-        if ($this->owner->config()->get('stop_veralign_inheritance')) {
-            $veralign = $this->owner->config()->get('veralign', Config::UNINHERITED);
+        if ($this->getOwner()->config()->get('stop_veralign_inheritance')) {
+            $veralign = $this->getOwner()->config()->get('veralign', Config::UNINHERITED);
         } else {
-            $veralign = $this->owner->config()->get('veralign');
+            $veralign = $this->getOwner()->config()->get('veralign');
         }
 
         $veralign = key($veralign);
-        $this->owner->VerAlign = $veralign;
+        $this->getOwner()->VerAlign = $veralign;
 
         parent::populateDefaults();
     }

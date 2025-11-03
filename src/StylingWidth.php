@@ -2,13 +2,19 @@
 
 namespace Fractas\ElementalStylings;
 
+use SilverStripe\Core\Extension;
+use SilverStripe\Model\ArrayData;
+use DNADesign\Elemental\Models\ElementContent;
+use DNADesign\ElementalUserForms\Model\ElementForm;
 use Fractas\ElementalStylings\Forms\StylingOptionsetField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\ORM\DataExtension;
-use SilverStripe\View\ArrayData;
 
-class StylingWidth extends DataExtension
+/**
+ * @property ?string $Width
+ * @extends Extension<(ElementContent&static|ElementForm&static)>
+ */
+class StylingWidth extends Extension
 {
     private static $db = [
         'Width' => 'Varchar(255)',
@@ -33,14 +39,14 @@ class StylingWidth extends DataExtension
 
     public function getStylingWidthNice($key)
     {
-        return (!empty($this->owner->config()->get('width')[$key])) ? $this->owner->config()->get('width')[$key] : $key;
+        return (!empty($this->getOwner()->config()->get('width')[$key])) ? $this->getOwner()->config()->get('width')[$key] : $key;
     }
 
     public function getStylingWidthData()
     {
         return ArrayData::create([
-           'Label' => self::$singular_name,
-           'Value' => $this->getStylingWidthNice($this->owner->Width),
+           'Label' => self::config()->get('singular_name'),
+           'Value' => $this->getStylingWidthNice($this->getOwner()->Width),
        ]);
     }
 
@@ -49,8 +55,8 @@ class StylingWidth extends DataExtension
      */
     public function getWidthVariant()
     {
-        $width = $this->owner->Width;
-        $widths = $this->owner->config()->get('width');
+        $width = $this->getOwner()->Width;
+        $widths = $this->getOwner()->config()->get('width');
 
         if (isset($widths[$width])) {
             $width = strtolower($width);
@@ -61,11 +67,11 @@ class StylingWidth extends DataExtension
         return $width;
     }
 
-    public function updateCMSFields(FieldList $fields)
+    protected function updateCMSFields(FieldList $fields)
     {
-        $width = $this->owner->config()->get('width');
+        $width = $this->getOwner()->config()->get('width');
         if ($width && count($width) > 1) {
-            $fields->addFieldsToTab('Root.Styling', StylingOptionsetField::create('Width', _t(__CLASS__.'.WIDTH', 'Width Size'), $width));
+            $fields->addFieldToTab('Root.Styling', StylingOptionsetField::create('Width', _t(__CLASS__.'.WIDTH', 'Width Size'), $width));
         } else {
             $fields->removeByName('Width');
         }
@@ -73,12 +79,12 @@ class StylingWidth extends DataExtension
         return $fields;
     }
 
-    public function populateDefaults()
+    public function onAfterPopulateDefaults()
     {
-        $width = $this->owner->config()->get('width');
+        $width = $this->getOwner()->config()->get('width');
         $width = reset($width);
 
-        $this->owner->Width = $width;
+        $this->getOwner()->Width = $width;
 
         parent::populateDefaults();
     }

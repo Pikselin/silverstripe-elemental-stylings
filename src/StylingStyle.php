@@ -2,12 +2,17 @@
 
 namespace Fractas\ElementalStylings;
 
+use SilverStripe\Core\Extension;
+use SilverStripe\Model\ArrayData;
+use DNADesign\Elemental\Models\BaseElement;
+use Pikselin\Elemental\Video\ElementalVideo;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\ORM\DataExtension;
-use SilverStripe\View\ArrayData;
 
-class StylingStyle extends DataExtension
+/**
+ * @extends Extension<(BaseElement&static|ElementalVideo&static)>
+ */
+class StylingStyle extends Extension
 {
     /**
      * @var string
@@ -28,14 +33,14 @@ class StylingStyle extends DataExtension
 
     public function getStylingStyleNice($key)
     {
-        return (!empty($this->owner->config()->get('styles')[$key])) ? $this->owner->config()->get('styles')[$key] : $key;
+        return (!empty($this->getOwner()->config()->get('styles')[$key])) ? $this->getOwner()->config()->get('styles')[$key] : $key;
     }
 
     public function getStylingStyleData()
     {
         return ArrayData::create([
-               'Label' => self::$singular_name,
-               'Value' => $this->getStylingStyleNice($this->owner->Style),
+               'Label' => self::config()->get('singular_name'),
+               'Value' => $this->getStylingStyleNice($this->getOwner()->Style),
            ]);
     }
 
@@ -43,30 +48,31 @@ class StylingStyle extends DataExtension
     {
         return ArrayData::create([
                'Label' => 'Title',
-               'Value' => $this->owner->obj('ShowTitle')->Nice(),
+               'Value' => $this->getOwner()->obj('ShowTitle')->Nice(),
            ]);
     }
 
     /**
      * @return string
      */
-    public function updateStyleVariant(&$style)
+    protected function updateStyleVariant(&$style)
     {
         if (isset($style)) {
             $style = strtolower($style);
         } else {
             $style = '';
         }
+
         $style = 'style-'.$style;
 
         return $style;
     }
 
-    public function updateCMSFields(FieldList $fields)
+    protected function updateCMSFields(FieldList $fields)
     {
-        $style = $this->owner->config()->get('styles');
+        $style = $this->getOwner()->config()->get('styles');
         if ($style && count($style) > 1) {
-            $fields->addFieldsToTab('Root.Styling', DropdownField::create('Style', _t(__CLASS__.'.STYLE', 'Style'), $style));
+            $fields->addFieldToTab('Root.Styling', DropdownField::create('Style', _t(__CLASS__.'.STYLE', 'Style'), $style));
         } else {
             $fields->removeByName('Style');
         }
@@ -74,12 +80,12 @@ class StylingStyle extends DataExtension
         return $fields;
     }
 
-    public function populateDefaults()
+    public function onAfterPopulateDefaults()
     {
-        $style = $this->owner->config()->get('styles');
+        $style = $this->getOwner()->config()->get('styles');
         $style = array_key_first($style);
 
-        $this->owner->Style = $style;
+        $this->getOwner()->Style = $style;
 
         parent::populateDefaults();
     }

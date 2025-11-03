@@ -2,12 +2,17 @@
 
 namespace Fractas\ElementalStylings;
 
+use SilverStripe\Core\Extension;
+use SilverStripe\Model\ArrayData;
+use Pikselin\Elemental\Video\ElementalVideo;
 use Fractas\ElementalStylings\Forms\StylingOptionsetField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\ORM\DataExtension;
-use SilverStripe\View\ArrayData;
 
-class StylingTextAlign extends DataExtension
+/**
+ * @property ?string $TextAlign
+ * @extends Extension<ElementalVideo&static>
+ */
+class StylingTextAlign extends Extension
 {
     private static $db = [
         'TextAlign' => 'Varchar(255)',
@@ -32,14 +37,14 @@ class StylingTextAlign extends DataExtension
 
     public function getStylingTextAlignNice($key)
     {
-        return (!empty($this->owner->config()->get('textalign')[$key])) ? $this->owner->config()->get('textalign')[$key] : $key;
+        return (!empty($this->getOwner()->config()->get('textalign')[$key])) ? $this->getOwner()->config()->get('textalign')[$key] : $key;
     }
 
     public function getStylingTextAlignData()
     {
         return ArrayData::create([
-               'Label' => self::$singular_name,
-               'Value' => $this->getStylingTextAlignNice($this->owner->TextAlign),
+               'Label' => self::config()->get('singular_name'),
+               'Value' => $this->getStylingTextAlignNice($this->getOwner()->TextAlign),
            ]);
     }
 
@@ -48,8 +53,8 @@ class StylingTextAlign extends DataExtension
      */
     public function getTextAlignVariant()
     {
-        $textalign = $this->owner->TextAlign;
-        $textaligns = $this->owner->config()->get('textalign');
+        $textalign = $this->getOwner()->TextAlign;
+        $textaligns = $this->getOwner()->config()->get('textalign');
 
         if (isset($textaligns[$textalign])) {
             $textalign = strtolower($textalign);
@@ -60,12 +65,12 @@ class StylingTextAlign extends DataExtension
         return 'textalign-'.$textalign;
     }
 
-    public function updateCMSFields(FieldList $fields)
+    protected function updateCMSFields(FieldList $fields)
     {
         $fields->removeByName('TextAlign');
-        $textalign = $this->owner->config()->get('textalign');
+        $textalign = $this->getOwner()->config()->get('textalign');
         if ($textalign && count($textalign) > 1) {
-            $fields->addFieldsToTab(
+            $fields->addFieldToTab(
                 'Root.Styling',
                 StylingOptionsetField::create('TextAlign', _t(__CLASS__.'.TEXTALIGN', 'Text Align'), $textalign)
             );
@@ -74,12 +79,12 @@ class StylingTextAlign extends DataExtension
         return $fields;
     }
 
-    public function populateDefaults()
+    public function onAfterPopulateDefaults()
     {
-        $textalign = $this->owner->config()->get('textalign');
+        $textalign = $this->getOwner()->config()->get('textalign');
         $textalign = key($textalign);
 
-        $this->owner->TextAlign = $textalign;
+        $this->getOwner()->TextAlign = $textalign;
 
         parent::populateDefaults();
     }

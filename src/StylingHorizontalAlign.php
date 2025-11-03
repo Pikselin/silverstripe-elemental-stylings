@@ -2,12 +2,16 @@
 
 namespace Fractas\ElementalStylings;
 
+use SilverStripe\Core\Extension;
+use SilverStripe\Model\ArrayData;
 use Fractas\ElementalStylings\Forms\StylingOptionsetField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\ORM\DataExtension;
-use SilverStripe\View\ArrayData;
 
-class StylingHorizontalAlign extends DataExtension
+/**
+ * @property ?string $HorAlign
+ * @extends Extension<static>
+ */
+class StylingHorizontalAlign extends Extension
 {
     private static $db = [
         'HorAlign' => 'Varchar(255)',
@@ -32,14 +36,14 @@ class StylingHorizontalAlign extends DataExtension
 
     public function getStylingHorizontalAlignNice($key)
     {
-        return (!empty($this->owner->config()->get('horalign')[$key])) ? $this->owner->config()->get('horalign')[$key] : $key;
+        return (!empty($this->getOwner()->config()->get('horalign')[$key])) ? $this->getOwner()->config()->get('horalign')[$key] : $key;
     }
 
     public function getStylingHorizontalAlignData()
     {
         return ArrayData::create([
-               'Label' => self::$singular_name,
-               'Value' => $this->getStylingHorizontalAlignNice($this->owner->HorAlign),
+               'Label' => self::config()->get('singular_name'),
+               'Value' => $this->getStylingHorizontalAlignNice($this->getOwner()->HorAlign),
            ]);
     }
 
@@ -48,8 +52,8 @@ class StylingHorizontalAlign extends DataExtension
      */
     public function getHorAlignVariant()
     {
-        $horalign = $this->owner->HorAlign;
-        $horaligns = $this->owner->config()->get('horalign');
+        $horalign = $this->getOwner()->HorAlign;
+        $horaligns = $this->getOwner()->config()->get('horalign');
 
         if (isset($horaligns[$horalign])) {
             $horalign = strtolower($horalign);
@@ -60,12 +64,12 @@ class StylingHorizontalAlign extends DataExtension
         return 'horalign-'.$horalign;
     }
 
-    public function updateCMSFields(FieldList $fields)
+    protected function updateCMSFields(FieldList $fields)
     {
         $fields->removeByName('HorAlign');
-        $horalign = $this->owner->config()->get('horalign');
+        $horalign = $this->getOwner()->config()->get('horalign');
         if ($horalign && count($horalign) > 1) {
-            $fields->addFieldsToTab(
+            $fields->addFieldToTab(
                 'Root.Styling',
                 StylingOptionsetField::create('HorAlign', _t(__CLASS__.'.HORIZONTALALIGN', 'Horizontal Align'), $horalign)
             );
@@ -74,12 +78,12 @@ class StylingHorizontalAlign extends DataExtension
         return $fields;
     }
 
-    public function populateDefaults()
+    public function onAfterPopulateDefaults()
     {
-        $horalign = $this->owner->config()->get('horalign');
+        $horalign = $this->getOwner()->config()->get('horalign');
         $horalign = key($horalign);
 
-        $this->owner->HorAlign = $horalign;
+        $this->getOwner()->HorAlign = $horalign;
 
         parent::populateDefaults();
     }

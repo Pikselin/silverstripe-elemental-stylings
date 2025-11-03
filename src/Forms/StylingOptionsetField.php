@@ -2,9 +2,9 @@
 
 namespace Fractas\ElementalStylings\Forms;
 
+use SilverStripe\Model\List\ArrayList;
 use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\OptionsetField;
-use SilverStripe\ORM\ArrayList;
 use SilverStripe\View\Requirements;
 
 class StylingOptionsetField extends OptionsetField
@@ -20,7 +20,7 @@ class StylingOptionsetField extends OptionsetField
         }
 
         $properties = array_merge($properties, [
-            'Options' => new ArrayList($options),
+            'Options' => ArrayList::create($options),
         ]);
 
         Requirements::javascript('fractas/elemental-stylings:client/dist/js/StylingOptionsetField.js');

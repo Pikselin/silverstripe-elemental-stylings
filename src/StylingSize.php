@@ -2,12 +2,16 @@
 
 namespace Fractas\ElementalStylings;
 
+use SilverStripe\Core\Extension;
+use SilverStripe\Model\ArrayData;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\ORM\DataExtension;
-use SilverStripe\View\ArrayData;
 
-class StylingSize extends DataExtension
+/**
+ * @property ?string $Size
+ * @extends Extension<static>
+ */
+class StylingSize extends Extension
 {
     private static $db = [
         'Size' => 'Varchar(255)',
@@ -32,14 +36,14 @@ class StylingSize extends DataExtension
 
     public function getStylingSizeNice($key)
     {
-        return (!empty($this->owner->config()->get('size')[$key])) ? $this->owner->config()->get('size')[$key] : $key;
+        return (!empty($this->getOwner()->config()->get('size')[$key])) ? $this->getOwner()->config()->get('size')[$key] : $key;
     }
 
     public function getStylingSizeData()
     {
         return ArrayData::create([
-           'Label' => self::$singular_name,
-           'Value' => $this->getStylingSizeNice($this->owner->Size),
+           'Label' => self::config()->get('singular_name'),
+           'Value' => $this->getStylingSizeNice($this->getOwner()->Size),
        ]);
     }
 
@@ -48,8 +52,8 @@ class StylingSize extends DataExtension
      */
     public function getSizeVariant()
     {
-        $size = $this->owner->Size;
-        $sizes = $this->owner->config()->get('size');
+        $size = $this->getOwner()->Size;
+        $sizes = $this->getOwner()->config()->get('size');
 
         if (isset($sizes[$size])) {
             $size = strtolower($size);
@@ -60,11 +64,11 @@ class StylingSize extends DataExtension
         return 'size-'.$size;
     }
 
-    public function updateCMSFields(FieldList $fields)
+    protected function updateCMSFields(FieldList $fields)
     {
-        $size = $this->owner->config()->get('size');
+        $size = $this->getOwner()->config()->get('size');
         if ($size && count($size) > 1) {
-            $fields->addFieldsToTab('Root.Styling', DropdownField::create('Size', _t(__CLASS__.'.SIZE', 'Size'), $size));
+            $fields->addFieldToTab('Root.Styling', DropdownField::create('Size', _t(__CLASS__.'.SIZE', 'Size'), $size));
         } else {
             $fields->removeByName('Size');
         }
@@ -72,12 +76,12 @@ class StylingSize extends DataExtension
         return $fields;
     }
 
-    public function populateDefaults()
+    public function onAfterPopulateDefaults()
     {
-        $size = $this->owner->config()->get('size');
+        $size = $this->getOwner()->config()->get('size');
         $size = reset($size);
 
-        $this->owner->Size = $size;
+        $this->getOwner()->Size = $size;
 
         parent::populateDefaults();
     }
