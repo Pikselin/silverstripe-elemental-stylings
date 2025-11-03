@@ -84,7 +84,5 @@ class StylingHorizontalAlign extends Extension
         $horalign = key($horalign);
 
         $this->getOwner()->HorAlign = $horalign;
-
-        parent::populateDefaults();
     }
 }

@@ -85,7 +85,5 @@ class StylingTextAlign extends Extension
         $textalign = key($textalign);
 
         $this->getOwner()->TextAlign = $textalign;
-
-        parent::populateDefaults();
     }
 }

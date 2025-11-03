@@ -85,7 +85,5 @@ class StylingWidth extends Extension
         $width = reset($width);
 
         $this->getOwner()->Width = $width;
-
-        parent::populateDefaults();
     }
 }

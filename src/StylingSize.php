@@ -82,7 +82,5 @@ class StylingSize extends Extension
         $size = reset($size);
 
         $this->getOwner()->Size = $size;
-
-        parent::populateDefaults();
     }
 }

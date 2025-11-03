@@ -88,7 +88,5 @@ class StylingVerticalAlign extends Extension
 
         $veralign = key($veralign);
         $this->getOwner()->VerAlign = $veralign;
-
-        parent::populateDefaults();
     }
 }

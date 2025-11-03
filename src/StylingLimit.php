@@ -82,7 +82,5 @@ class StylingLimit extends Extension
         $limit = reset($limit);
 
         $this->getOwner()->Limit = $limit;
-
-        parent::populateDefaults();
     }
 }

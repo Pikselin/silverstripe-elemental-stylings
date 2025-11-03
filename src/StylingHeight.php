@@ -83,7 +83,5 @@ class StylingHeight extends Extension
         $height = reset($height);
 
         $this->getOwner()->Height = $height;
-
-        parent::populateDefaults();
     }
 }
