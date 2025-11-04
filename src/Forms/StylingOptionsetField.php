@@ -23,7 +23,7 @@ class StylingOptionsetField extends OptionsetField
             'Options' => ArrayList::create($options),
         ]);
 
-        Requirements::javascript('fractas/elemental-stylings:client/dist/js/StylingOptionsetField.js');
+        Requirements::javascript('pikselin/elemental-stylings:client/dist/js/StylingOptionsetField.js');
 
         return FormField::Field($properties);
     }
